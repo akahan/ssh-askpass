@@ -15,21 +15,29 @@
 # PERFORMANCE OF THIS SOFTWARE.
 
 on run argv
-    set args to argv as text
-    launch application "System Events"
-    set agent to POSIX file "/System/Applications/Utilities/Terminal.app/Contents/Resources/Terminal.icns"
+    set prompt to argv as text
+
     set dialog_timeout to 15
+
+    set agent to POSIX file "/System/Applications/Utilities/Terminal.app/Contents/Resources/Terminal.icns"
+
+    set ok_button to {get localized string of "OK"}
+    set cancel_button to {get localized string of "Cancel"}
+    set dialog_buttons to {cancel_button, ok_button}
+
+    launch application "System Events"
+
     try
         tell application "System Events"
-            if args ends with ": " or args ends with ":" then
-                if args contains "pass" or args contains "pin" then
-                    display dialog args with icon agent default button {get localized string of "OK"} default answer "" with hidden answer
+            if prompt ends with ": " or prompt ends with ":" then
+                if prompt contains "pass" or prompt contains "pin" then
+                    display dialog prompt with icon agent buttons dialog_buttons default button ok_button default answer "" with hidden answer
                 else
-                    display dialog args with icon agent default button {get localized string of "OK"} default answer ""
+                    display dialog prompt with icon agent buttons dialog_buttons default button ok_button default answer ""
                 end if
                 set text_returned to result's text returned
             else
-                display dialog args with icon agent default button {get localized string of "Cancel"} giving up after dialog_timeout
+                display dialog prompt with icon agent buttons dialog_buttons default button cancel_button giving up after dialog_timeout
                 if gave up of result then
                     error result
                 end if
